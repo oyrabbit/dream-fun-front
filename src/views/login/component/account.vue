@@ -1,6 +1,16 @@
 <template>
-  <el-form size="large" class="login-content-form">
-    <el-form-item class="login-animation1">
+  <el-form size="large" class="login-content-form" ref="formRulesOneRef" :model="state.ruleForm">
+    <el-form-item
+      class="login-animation1"
+      prop="userName"
+      :rules="[
+        {
+          required: true,
+          message: `用户名不能为空`,
+          trigger: 'blur'
+        }
+      ]"
+    >
       <el-input
         text
         placeholder="请输入用户名"
@@ -13,7 +23,17 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item class="login-animation2">
+    <el-form-item
+      class="login-animation2"
+      prop="password"
+      :rules="[
+        {
+          required: true,
+          message: `密码不能为空`,
+          trigger: 'blur'
+        }
+      ]"
+    >
       <el-input
         :type="state.isShowPassword ? 'text' : 'password'"
         placeholder="请输入密码"
@@ -33,7 +53,17 @@
         </template>
       </el-input>
     </el-form-item>
-    <el-form-item class="login-animation3">
+    <el-form-item
+      class="login-animation3"
+      prop="code"
+      :rules="[
+        {
+          required: true,
+          message: `验证码不能为空`,
+          trigger: 'blur'
+        }
+      ]"
+    >
       <el-col :span="15">
         <el-input
           text
@@ -59,7 +89,7 @@
         class="login-content-submit"
         round
         v-waves
-        @click="onSignIn"
+        @click="onSignIn(formRulesOneRef)"
         :loading="state.loading.signIn"
       >
         <span>登 录</span>
@@ -69,9 +99,10 @@
 </template>
 
 <script setup lang="ts" name="loginAccount">
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import Cookies from 'js-cookie'
 import { storeToRefs } from 'pinia'
 import { useThemeConfig } from '/@/stores/themeConfig'
@@ -80,12 +111,15 @@ import { initBackEndControlRoutes } from '/@/router/backEnd'
 import { Session } from '/@/utils/storage'
 import { formatAxis } from '/@/utils/formatTime'
 import { NextLoading } from '/@/utils/loading'
+import { useLoginApi } from '/@/api/login/index'
 
 // 定义变量内容
 const storesThemeConfig = useThemeConfig()
 const { themeConfig } = storeToRefs(storesThemeConfig)
 const route = useRoute()
 const router = useRouter()
+const loginApi = useLoginApi()
+const formRulesOneRef = ref<FormInstance>()
 const state = reactive({
   isShowPassword: false,
   ruleForm: {
@@ -103,23 +137,42 @@ const currentTime = computed(() => {
   return formatAxis(new Date())
 })
 // 登录
-const onSignIn = async () => {
-  state.loading.signIn = true
-  // 存储 token 到浏览器缓存
-  Session.set('token', Math.random().toString(36).substr(0))
-  // 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
-  Cookies.set('userName', state.ruleForm.userName)
-  if (!themeConfig.value.isRequestRoutes) {
-    // 前端控制路由，2、请注意执行顺序
-    const isNoPower = await initFrontEndControlRoutes()
-    signInSuccess(isNoPower)
-  } else {
-    // 模拟后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
-    // 添加完动态路由，再进行 router 跳转，否则可能报错 No match found for location with path "/"
-    const isNoPower = await initBackEndControlRoutes()
-    // 执行完 initBackEndControlRoutes，再执行 signInSuccess
-    signInSuccess(isNoPower)
-  }
+const onSignIn = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.validate(async (valid: boolean) => {
+    if (valid) {
+      state.loading.signIn = true
+      await loginApi
+        .signIn({
+          username: state.ruleForm.userName,
+          password: state.ruleForm.password
+        })
+        .then(async (res) => {
+          if (res.status === 200) {
+            // 存储 token 到浏览器缓存
+            Session.set('token', res.token)
+            // 模拟数据，对接接口时，记得删除多余代码及对应依赖的引入。用于 `/src/stores/userInfo.ts` 中不同用户登录判断（模拟数据）
+            Cookies.set('userName', state.ruleForm.userName)
+            if (!themeConfig.value.isRequestRoutes) {
+              // 前端控制路由，2、请注意执行顺序
+              const isNoPower = await initFrontEndControlRoutes()
+              signInSuccess(isNoPower)
+            } else {
+              // 模拟后端控制路由，isRequestRoutes 为 true，则开启后端控制路由
+              // 添加完动态路由，再进行 router 跳转，否则可能报错 No match found for location with path "/"
+              const isNoPower = await initBackEndControlRoutes()
+              // 执行完 initBackEndControlRoutes，再执行 signInSuccess
+              signInSuccess(isNoPower)
+            }
+          } else {
+            ElMessage.warning(res.message)
+            state.loading.signIn = false
+          }
+        })
+    } else {
+      return false
+    }
+  })
 }
 // 登录成功后的跳转
 const signInSuccess = (isNoPower: boolean | undefined) => {

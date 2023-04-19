@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        width="150"
+        :width="config.operateWidth"
         v-if="config.isOperate"
         fixed="right"
         align="center"

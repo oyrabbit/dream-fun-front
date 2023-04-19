@@ -58,7 +58,7 @@
 <script setup lang="ts" name="makeTableDemo">
 import { defineAsyncComponent, ref, onMounted, watch } from 'vue'
 import router from '/@/router'
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { useTableList } from '/@/stores/tableList'
 

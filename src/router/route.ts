@@ -1,5 +1,8 @@
 import { RouteRecordRaw } from 'vue-router'
 import home from './modules/home'
+import userManage from './modules/user-manage'
+import cateManage from './modules/cate-manage'
+import websiteManage from './modules/website-manage'
 /**
  * 建议：路由 path 路径与文件夹名称相同，找文件可浏览器地址找，方便定位文件位置
  *
@@ -46,9 +49,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
     meta: {
       isKeepAlive: true
     },
-    children: [
-      home,
-    ]
+    children: [home, cateManage, websiteManage, userManage]
   }
 ]
 

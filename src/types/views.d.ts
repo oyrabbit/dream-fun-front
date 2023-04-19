@@ -309,6 +309,7 @@ declare type TableHeaderType = {
 declare type TableSearchType = {
   label: string // 搜索项名称
   prop: string // 搜索项标签，必须唯一
+  width: string | number // 搜索标签宽度
   placeholder: string // 搜索项占位符
   required: boolean // 是否必填
   type: 'input' | 'date' | 'select' | '' // 搜索项类型，目前支持输入框、日期选择器、下拉框
@@ -339,6 +340,7 @@ declare type TableData<T = any> = {
     isSelection: boolean // 是否显示表格序号
     isSerialNo: boolean // 是否显示表格多选
     isOperate: boolean // 是否显示表格操作栏
+    operateWidth: number // 操作栏宽度
     isExportBtnShow: boolean // 是否显示左上角导出按钮
   }
   // 操作列配置
