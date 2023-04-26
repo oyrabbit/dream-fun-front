@@ -49,7 +49,7 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
     meta: {
       isKeepAlive: true
     },
-    children: [home, cateManage, websiteManage, userManage]
+    children: [home, websiteManage, cateManage, userManage]
   }
 ]
 

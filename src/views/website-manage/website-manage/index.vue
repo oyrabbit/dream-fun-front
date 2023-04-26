@@ -10,25 +10,18 @@
       @btnClick="handleBtnClick"
       @delRow="delRow"
     />
-    <Detail
-      title="修改密码"
-      :data="[]"
-      :btns="editPwdBtns"
-      v-model:dialogFormVisible="state.editPwdShow"
-      @dialogBtnClick="hanleDetailClick"
-    />
     <Detail1
-      title="编辑用户"
-      :data="editUserData"
-      :btns="editUserBtns"
-      v-model:dialogFormVisible="state.editUserShow"
+      title="编辑网站"
+      :data="{ fcateList: fcateList, editFormData: editWebsiteData }"
+      :btns="editCateBtns"
+      v-model:dialogFormVisible="state.editWebsiteShow"
       @dialogBtnClick="hanleDetail1Click"
     />
     <Detail2
-      title="添加用户"
-      :data="[]"
-      :btns="addUserBtns"
-      v-model:dialogFormVisible="state.addUserShow"
+      title="新增网站"
+      :data="{ fcateList: fcateList }"
+      :btns="addWebsiteBtns"
+      v-model:dialogFormVisible="state.addWebsiteShow"
       @dialogBtnClick="hanleDetail2Click"
     />
   </div>
@@ -36,16 +29,17 @@
 
 <script setup lang="ts">
 import { defineAsyncComponent, ref, computed, onMounted, reactive } from 'vue'
-import { useUserApi } from '/@/api/admin/user'
+import { useWebsiteApi } from '/@/api/admin/website'
+import { useFCateApi } from '/@/api/admin/fcategory'
 import { ElMessage } from 'element-plus'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 const TableList = defineAsyncComponent(() => import('../../../components/tableList/index.vue'))
-const Detail = defineAsyncComponent(() => import('./detail.vue'))
 const Detail1 = defineAsyncComponent(() => import('./detail1.vue'))
 const Detail2 = defineAsyncComponent(() => import('./detail2.vue'))
-const userApi = useUserApi()
+const websiteApi = useWebsiteApi()
+const fcateApi = useFCateApi()
 
 const tableData = computed((): TableData => {
   return {
@@ -54,7 +48,7 @@ const tableData = computed((): TableData => {
     btns: [
       {
         id: 1,
-        title: '新增用户',
+        title: '新增网站',
         // path: '/project-initiation/declare-entry/add-project'
         click: true
       }
@@ -66,28 +60,49 @@ const tableData = computed((): TableData => {
       {
         key: 'col1',
         colWidth: '100',
-        title: '用户id',
+        title: '网站id',
         type: 'text',
         isCheck: true
       },
       {
         key: 'col2',
         colWidth: '',
-        title: '用户名',
+        title: '网站名称',
         type: 'text',
         isCheck: true
       },
       {
         key: 'col3',
         colWidth: '',
-        title: '注册时间',
+        title: '网站地址',
         type: 'text',
         isCheck: true
       },
       {
         key: 'col4',
         colWidth: '',
-        title: '角色',
+        title: '所属分类',
+        type: 'text',
+        isCheck: true
+      },
+      {
+        key: 'col5',
+        colWidth: '',
+        title: '所属大分类',
+        type: 'text',
+        isCheck: true
+      },
+      {
+        key: 'col6',
+        colWidth: '200',
+        title: '描述',
+        type: 'text',
+        isCheck: true
+      },
+      {
+        key: 'col7',
+        colWidth: '80',
+        title: '优先级',
         type: 'text',
         isCheck: true
       }
@@ -100,24 +115,18 @@ const tableData = computed((): TableData => {
       isSerialNo: false, // 是否显示表格序号
       isSelection: true, // 是否显示表格多选
       isOperate: true, // 是否显示表格操作栏
-      operateWidth: 200,
+      operateWidth: 150,
       isExportBtnShow: false // 是否显示导出组件
     },
     operations: [
       {
         id: 1,
-        name: '修改密码',
-        // path: ''
-        click: true
-      },
-      {
-        id: 2,
         name: '编辑',
         // path: ''
         click: true
       },
       {
-        id: 3,
+        id: 2,
         name: '删除',
         // path: ''
         click: true
@@ -126,12 +135,12 @@ const tableData = computed((): TableData => {
     // 搜索表单，动态生成（传空数组时，将不显示搜索，注意格式）
     search: [
       {
-        label: '用户名',
+        label: '网站名称',
         prop: 'val1',
-        placeholder: '按用户名查找',
+        placeholder: '按网站名称查找',
         required: true,
         type: 'input',
-        width: 75
+        width: 100
       }
     ],
     // 搜索参数（不用传，用于分页、搜索时传给后台的值，`getTableData` 中使用）
@@ -142,36 +151,55 @@ const tableData = computed((): TableData => {
   }
 })
 
+const fcateList = ref<RefType>([])
+
+const getFcateList = async () => {
+  const params = { pagenum: 1, pagesize: 9999 }
+  await fcateApi.getFCate({ ...params, fcatename: '' }).then((res) => {
+    const cateData: EmptyArrayType = []
+    res.data?.forEach((item: any) => {
+      cateData.push({
+        id: item.id,
+        name: item.name
+      })
+    })
+    fcateList.value = cateData
+  })
+}
+
 // 编辑部分
 const state = reactive({
-  editPwdShow: false,
-  editUserShow: false,
-  addUserShow: false
+  editWebsiteShow: false,
+  addWebsiteShow: false
 })
 
-const editPwdId = ref(0)
-const editUserId = ref(0)
-const editUserData = reactive({
-  username: '',
-  role: ''
+const editWebsiteId = ref(0)
+const editWebsiteData = reactive({
+  name: '',
+  url: '',
+  description: '',
+  catename: '',
+  fcatename: '',
+  priority: 0
 })
 
 const handleOperationsClick = (id: number, row: EmptyObjectType) => {
   if (id === 1) {
-    state.editPwdShow = true
-    editPwdId.value = row.col1
-  } else if (id === 2) {
-    editUserId.value = row.col1
-    editUserData.username = row.col2
-    editUserData.role = row.col4
-    state.editUserShow = true
+    editWebsiteId.value = row.col1
+    editWebsiteData.name = row.col2
+    editWebsiteData.url = row.col3
+    editWebsiteData.catename = row.col4
+    editWebsiteData.fcatename = row.col5
+    editWebsiteData.description = row.col6
+    editWebsiteData.priority = row.col7
+    state.editWebsiteShow = true
   }
 }
 
 // 删除
 const delRow = async (row: EmptyObjectType) => {
   console.log(row)
-  await userApi.delUser(row?.col1).then((res) => {
+  await websiteApi.delWebsite(row?.col1).then((res) => {
     if (res.status === 200) {
       ElMessage.success('刪除成功！')
     } else {
@@ -181,7 +209,7 @@ const delRow = async (row: EmptyObjectType) => {
   })
 }
 
-const editPwdBtns = [
+const editCateBtns = [
   {
     id: 1,
     title: '确认',
@@ -190,7 +218,7 @@ const editPwdBtns = [
   }
 ]
 
-const editUserBtns = [
+const addWebsiteBtns = [
   {
     id: 1,
     title: '确认',
@@ -198,51 +226,38 @@ const editUserBtns = [
     click: true
   }
 ]
-
-const addUserBtns = [
-  {
-    id: 1,
-    title: '确认',
-    type: 'primary',
-    click: true
-  }
-]
-const hanleDetailClick = async (id: number, form: any) => {
-  if (id === 1) {
-    await userApi.changePwd(editPwdId.value, { password: form.pass }).then((res) => {
-      if (res.status === 200) {
-        ElMessage.success('密码修改成功！')
-      } else {
-        ElMessage.warning(res.message)
-      }
-      state.editPwdShow = false
-      getListData()
-    })
-  }
-}
 const hanleDetail1Click = async (id: number, form: any) => {
   console.log(id, form)
   if (id === 1) {
-    await userApi
-      .editUser(editUserId.value, { username: form.username, role: form.role === '管理员' ? 1 : 2 })
+    await websiteApi
+      .editWebsite(editWebsiteId.value, {
+        name: form.name,
+        url: form.url,
+        category_id: form.catename,
+        description: form.description,
+        priority: form.priority
+      })
       .then((res) => {
         if (res.status === 200) {
           ElMessage.success('修改成功！')
         } else {
           ElMessage.warning(res.message)
         }
-        state.editUserShow = false
+        state.editWebsiteShow = false
         getListData()
       })
   }
 }
+
 const hanleDetail2Click = async (id: number, form: any) => {
   if (id === 1) {
-    await userApi
-      .addUser({
-        username: form.username,
-        password: form.pass,
-        role: form.role === '管理员' ? 1 : 2
+    await websiteApi
+      .addWebsite({
+        name: form.name,
+        url: form.url,
+        description: form.description,
+        category_id: form.catename,
+        priority: form.priority
       })
       .then((res) => {
         if (res.status === 200) {
@@ -250,14 +265,14 @@ const hanleDetail2Click = async (id: number, form: any) => {
         } else {
           ElMessage.warning(res.message)
         }
-        state.addUserShow = false
+        state.addWebsiteShow = false
         getListData()
       })
   }
 }
 const handleBtnClick = (id: number) => {
   if (id === 1) {
-    state.addUserShow = true
+    state.addWebsiteShow = true
   }
 }
 // 表部分
@@ -280,29 +295,33 @@ const pageChange = (data: TableDemoPageType) => {
 }
 const isLoading = ref(false)
 
-const getListData = async (username?: string) => {
+const getListData = async (webname?: string) => {
   const params = { pagenum: pageData.pageNumber, pagesize: pageData.pageSize }
 
   isLoading.value = true
-  await userApi.getUsers({ ...params, username: username || '' }).then((res) => {
-    const userData: EmptyArrayType = []
+  await websiteApi.getWebsite({ ...params, webname: webname || '' }).then((res) => {
+    const websiteData: EmptyArrayType = []
     if (res?.data) {
       res.data?.forEach((item: any) => {
-        userData.push({
-          col1: item.ID,
-          col2: item.username,
-          col3: moment(item.CreatedAt).format('YYYY-MM-DD HH:mm:ss'),
-          col4: item.role === 1 ? '管理员' : '普通用户'
+        websiteData.push({
+          col1: item?.id,
+          col2: item?.name,
+          col3: item?.url,
+          col4: item?.category_name,
+          col5: item?.f_category_name,
+          col6: item?.description,
+          col7: item?.priority
         })
       })
+      pageData.total = res?.data[0]?.total || 0
     }
-    data.value = userData
-    pageData.total = res.total
+    data.value = websiteData
     isLoading.value = false
   })
 }
 onMounted(() => {
   getListData()
+  getFcateList()
 })
 </script>
 

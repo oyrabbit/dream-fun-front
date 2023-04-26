@@ -1,11 +1,12 @@
 export default {
   path: '/home',
   name: 'home',
-  component: () => import('/@/views/home/index.vue'),
+  redirect: '/website-manage',
+  // component: () => import('/@/views/home/index.vue'),
   meta: {
     title: '首页',
     isLink: '',
-    isHide: false,
+    isHide: true,
     isKeepAlive: true,
     isAffix: true,
     isIframe: false,
