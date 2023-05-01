@@ -100,7 +100,7 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 是否开启色弱模式
       isInvert: false,
       // 是否开启水印
-      isWartermark: true,
+      isWartermark: false,
       // 水印文案
       wartermarkText: '梦趣导航管理系统',
 
@@ -137,9 +137,9 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 网站主标题（菜单导航、浏览器当前网页标题）
       globalTitle: '梦趣导航管理系统',
       // 网站副标题（登录页顶部文字）
-      globalViceTitle: 'vueNextAdmin',
+      globalViceTitle: '梦趣导航管理系统',
       // 网站副标题（登录页顶部文字）
-      globalViceTitleMsg: '专注、免费、开源、维护、解疑',
+      globalViceTitleMsg: '创造属于你自己的个性导航',
       // 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
       globalI18n: 'zh-cn',
       // 默认全局组件大小，可选值"<large|'default'|small>"，默认 'large'

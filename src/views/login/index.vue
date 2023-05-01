@@ -39,8 +39,8 @@ import { defineAsyncComponent, onMounted, reactive, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useThemeConfig } from '/@/stores/themeConfig'
 import { NextLoading } from '/@/utils/loading'
-import logoMini from '/@/assets/logo-mini.svg'
-import loginMain from '/@/assets/login-main.svg'
+import logoMini from '/@/assets/logo.png'
+import loginMain from '/@/assets/login-main.png'
 import loginBg from '/@/assets/login-bg.svg'
 
 // 引入组件
@@ -50,7 +50,7 @@ const Account = defineAsyncComponent(() => import('/@/views/login/component/acco
 const storesThemeConfig = useThemeConfig()
 const { themeConfig } = storeToRefs(storesThemeConfig)
 const state = reactive({
-  tabsActiveName: 'account',
+  tabsActiveName: 'account'
 })
 
 // 获取布局配置信息
@@ -81,8 +81,8 @@ onMounted(() => {
       z-index: 1;
       animation: logoAnimation 0.3s ease;
       img {
-        width: 52px;
-        height: 52px;
+        width: 80px;
+        height: 80px;
       }
       .login-left-logo-text {
         display: flex;
@@ -90,11 +90,11 @@ onMounted(() => {
         span {
           margin-left: 10px;
           font-size: 28px;
-          color: #26a59a;
+          color: #2672fe;
         }
         .login-left-logo-text-msg {
-          font-size: 12px;
-          color: #32a99e;
+          font-size: 14px;
+          color: #2672fe;
         }
       }
     }
@@ -103,8 +103,8 @@ onMounted(() => {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 100%;
-      height: 52%;
+      width: 60%;
+      height: 60%;
       img {
         width: 100%;
         height: 100%;

@@ -12,7 +12,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useThemeConfig } from '/@/stores/themeConfig'
-import logoMini from '/@/assets/logo-mini.svg'
+import logoMini from '/@/assets/logo.png'
 
 // 定义变量内容
 const storesThemeConfig = useThemeConfig()
@@ -54,7 +54,7 @@ const onThemeConfigChange = () => {
     }
   }
   &-medium-img {
-    width: 20px;
+    width: 30px;
     margin-right: 5px;
   }
 }
@@ -65,7 +65,7 @@ const onThemeConfigChange = () => {
   cursor: pointer;
   animation: logoAnimation 0.3s ease-in-out;
   &-img {
-    width: 20px;
+    width: 30px;
     margin: auto;
   }
   &:hover {
