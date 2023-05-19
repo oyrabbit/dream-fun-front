@@ -269,14 +269,18 @@ const pageData = reactive({
   total: 0
 })
 
+const searchData: any = ref({})
+
 const search = (data: EmptyObjectType) => {
+  searchData.value = data.value
+  pageData.pageNumber = 1
   getListData(data.value.val1)
 }
 
 const pageChange = (data: TableDemoPageType) => {
   pageData.pageNumber = data.pageNum
   pageData.pageSize = data.pageSize
-  getListData()
+  getListData(searchData.value.val1)
 }
 const isLoading = ref(false)
 

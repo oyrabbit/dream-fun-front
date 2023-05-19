@@ -80,7 +80,7 @@
       </el-col>
       <el-col :span="1"></el-col>
       <el-col :span="8">
-        <el-button class="login-content-code" v-waves>1234</el-button>
+        <el-button class="login-content-code" v-waves>8597</el-button>
       </el-col>
     </el-form-item>
     <el-form-item class="login-animation4">

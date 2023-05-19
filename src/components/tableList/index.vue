@@ -113,7 +113,7 @@ watch(
 // 搜索点击时表单回调
 const onSearch = (data: EmptyObjectType) => {
   // console.log(data)
-  storesTableList.page = Object.assign({}, props.tableData.page, { ...data })
+  // storesTableList.page = Object.assign({}, props.tableData.page, { ...data })
   // tableRef.value.pageReset()
   emit('search', data)
 }
